@@ -3,7 +3,7 @@
 #include <iterator>
 
 #define Kin 0.25
-#define Kout 0.5
+#define Kout 0.3
 
 namespace caches
 {
@@ -14,7 +14,7 @@ namespace caches
 		size_t cur_size;
 
 		std::list<T> list_;
-		std::unordered_map<T, T*> hash_;
+		std::unordered_map<data_t, T*> hash_;
 
 		queue_()
 		{
@@ -25,10 +25,11 @@ namespace caches
 		queue_(size_t size)
 		{
 			max_size = size;
+			cur_size = 0;
 			for(size_t i = 0; i < max_size; i++)
 				list_.push_back(T());
 		}
-		void add_data(data_t data)
+		void add_data(T data)
 		{
 			list_.push_front(data);
 			hash_.insert({data, &data});
@@ -39,22 +40,16 @@ namespace caches
 
 			cur_size++;
 		}
-		void remove_data(data_t data)
+		void remove_data(T data)
 		{
 			hash_.erase(data);
 			list_.remove(data);
 			list_.push_back(T());
 			cur_size--;
 		}
-		bool full()
+		bool search(T data)
 		{
-			if(max_size == cur_size)
-				return true;
-			return false;
-		}
-		bool search(int data)
-		{
-			typename std::unordered_map<T,T*>::iterator it = hash_.find(data);
+			typename std::unordered_map<data_t,T*>::iterator it = hash_.find(data);
 			if(it == hash_.end())
 				return false;
 			else
@@ -62,21 +57,21 @@ namespace caches
 		}
 	};
 
-	template <typename T, typename data_t>
+	template <typename T>
 	struct cache_
 	{
-		struct queue_<T> Am;
-		struct queue_<T> A1in;
-		struct queue_<T> A1out;
+		queue_<T> Am;
+		queue_<T> A1in;
+		queue_<T> A1out;
 
 		cache_(size_t size): Am(), A1in(), A1out()
 		{
-			size_t size_a1in = Kin * size;
-			if(!size_a1in)
-				size_a1in = 1;
 			size_t size_a1out = Kout * size;
 			if(!size_a1out)
 				size_a1out = 1;
+			size_t size_a1in = Kin * size;
+			if(!size_a1in)
+				size_a1in = 1;
 			int size_am = size - size_a1out - size_a1in;
 			if(size_am <= 0)
 				size_am = 1;
@@ -84,34 +79,33 @@ namespace caches
 			A1out = queue_<T>(size_a1out);
 			Am = queue_<T>((size_t)size_am);
 		}
-		void reclaimfor(int data)
+		void reclaimfor(T data)
 		{
-			if(!A1in.full())
-			{
-				A1in.add_data(data);
-			} else if(!Am.full())
+			if(Am.cur_size < Am.max_size)
 			{
 				Am.add_data(data);
-			} else if(A1in.full())
+			} else if(A1in.cur_size < A1in.max_size)
 			{
-				int Ytale = A1in.list_.back();
-				A1out.add_data(Ytale);
+				A1in.add_data(data);
+			} else if(A1in.cur_size == A1in.max_size)
+			{
+				T Ytale = A1in.list_.back();
 				A1in.remove_data(Ytale);
-				if(A1out.full())
+				if(A1out.cur_size == A1out.max_size)
 				{
-					int Ztale = A1out.list_.back();
+					T Ztale = A1out.list_.back();
 					A1out.remove_data(Ztale);
 				}
+				A1out.add_data(Ytale);
 				A1in.add_data(data);
-			}
-			else
+			} else
 			{
-				int Ytale = Am.list_.back();
+				T Ytale = Am.list_.back();
 				Am.remove_data(Ytale);
 				Am.add_data(data);
 			}
 		}
-		bool accesing(int data)
+		bool accesing(T data)
 		{
 			if(Am.search(data))
 			{
@@ -122,7 +116,7 @@ namespace caches
 			else if(A1out.search(data))
 			{
 				reclaimfor(data);
-				return true;
+				return false;
 			} else if(A1in.search(data))
 				return true;
 			else
