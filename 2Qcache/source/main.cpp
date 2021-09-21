@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
 	size_t m;
 	int n;
 	std::cin >> m >> n;
-	caches::cache_<int> Q2(m);
+	cache_<int> Q2(m);
 	for(int i = 0; i < n; i++)
 	{
 		int q;
@@ -17,6 +17,6 @@ int main(int argc, char const *argv[])
 		if(Q2.accesing(q))
 			hits+=1;
 	}
-	fprintf(stderr,"%d\n", hits);
+	fprintf(stderr, "%d\n", hits);
 	return 0;
 }
