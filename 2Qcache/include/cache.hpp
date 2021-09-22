@@ -2,8 +2,8 @@
 #include <list>
 #include <iterator>
 
-#define Kin 0
-#define Kout 0.1
+#define Kin 0.2
+#define Kout 0.25
 
 template <typename T, typename data_t=int>
 struct queue_
@@ -24,25 +24,17 @@ struct queue_
 	{
 		max_size = size;
 		cur_size = 0;
-		for(size_t i = 0; i < max_size; i++)
-			list_.push_back(T());
 	}
 	void add_data(T data)
 	{
 		list_.push_front(data);
 		hash_.insert({data, &data});
-
-		T* del = &list_.back();
-		hash_.erase(*del);
-		list_.pop_back();
-
 		cur_size++;
 	}
 	void remove_data(T data)
 	{
 		hash_.erase(data);
 		list_.remove(data);
-		list_.push_back(T());
 		cur_size--;
 	}
 	bool search(T data)
@@ -52,6 +44,12 @@ struct queue_
 			return false;
 		else
 			return true;
+	}
+	bool full()
+	{
+		if(max_size == cur_size)
+			return true;
+		return false;
 	}
 };
 
@@ -78,28 +76,28 @@ struct cache_
 	}
 	void reclaimfor(T data)
 	{
-		if(A1in.cur_size < A1in.max_size)
+		if(!A1in.full())
 		{
 			A1in.add_data(data);
-		} else if(Am.cur_size < Am.max_size)
+			return;
+		}
+		if(!Am.full())
 		{
 			Am.add_data(data);
-		} else if(A1in.cur_size == A1in.max_size)
+			return;
+		}
+		if(A1in.full())
 		{
 			T Ytale = A1in.list_.back();
 			A1in.remove_data(Ytale);
-			if(A1out.cur_size == A1out.max_size)
+			if(A1out.full())
 			{
 				T Ztale = A1out.list_.back();
 				A1out.remove_data(Ztale);
 			}
 			A1out.add_data(Ytale);
 			A1in.add_data(data);
-		} else
-		{
-			T Ytale = Am.list_.back();
-			Am.remove_data(Ytale);
-			Am.add_data(data);
+			return;
 		}
 	}
 	bool accesing(T data)
