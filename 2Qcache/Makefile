@@ -1,2 +1,3 @@
+.PHONY: all
 all:
-	g++ ./source/main.cpp -o cache -Wall
+	g++ -std=c++11 -O2 -Wall -I include/ source/main.cpp -o cache
