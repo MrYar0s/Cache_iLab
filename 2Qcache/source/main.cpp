@@ -37,7 +37,7 @@ void input_test()
 		if(Q2.accesing(q))
 			hits+=1;
 	}
-	fprintf(stderr, "%d\n", hits);
+	std::cerr << "Hits = " << hits << std::endl;
 }
 
 int main(int argc, char const *argv[])

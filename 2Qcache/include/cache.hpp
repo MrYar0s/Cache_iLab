@@ -6,7 +6,7 @@
 const double Kin = 0.2;
 const double Kout = 0.25;
 
-template <typename T, typename data_t=int>
+template <typename T>
 struct queue_
 {
 	size_t max_size;
@@ -16,23 +16,21 @@ struct queue_
 	using ListIt = typename std::list<T>::iterator;
 	std::unordered_map<T, ListIt> hash_;
 
-	queue_()
-	{
-		max_size = 0;
-		cur_size = 0;
-	}
+	queue_() : max_size(), cur_size() {}
 
 	queue_(size_t size)
 	{
 		max_size = size;
 		cur_size = 0;
 	}
+
 	void add_data(T key)
 	{
 		list_.push_front(key);
 		hash_[key] = list_.begin();
 		cur_size++;
 	}
+
 	void remove_data(T key)
 	{
 		if(key == list_.back())
@@ -65,6 +63,7 @@ struct queue_
 		else
 			return true;
 	}
+
 	bool full()
 	{
 		if(max_size == cur_size)
@@ -79,7 +78,8 @@ struct cache_
 	queue_<T> Am;
 	queue_<T> A1in;
 	queue_<T> A1out;
-		cache_(size_t size): Am(), A1in(), A1out()
+
+	cache_(size_t size)
 	{
 		size_t size_a1out = Kout * size;
 		if(!size_a1out)
@@ -94,16 +94,17 @@ struct cache_
 		A1out = queue_<T>(size_a1out);
 		Am = queue_<T>((size_t)size_am);
 	}
-	void reclaimfor(T data)
+
+	void reclaimfor(T key)
 	{
 		if(!A1in.full())
 		{
-			A1in.add_data(data);
+			A1in.add_data(key);
 			return;
 		}
 		if(!Am.full())
 		{
-			Am.add_data(data);
+			Am.add_data(key);
 			return;
 		}
 		if(A1in.full())
@@ -116,27 +117,28 @@ struct cache_
 				A1out.remove_data(Ztale);
 			}
 			A1out.add_data(Ytale);
-			A1in.add_data(data);
+			A1in.add_data(key);
 			return;
 		}
 	}
-	bool accesing(T data)
+
+	bool accesing(T key)
 	{
-		if(Am.search(data))
+		if(Am.search(key))
 		{
-			Am.remove_data(data);
-			Am.add_data(data);
+			Am.remove_data(key);
+			Am.add_data(key);
 			return true;
 		}
-		else if(A1out.search(data))
+		else if(A1out.search(key))
 		{
-			reclaimfor(data);
+			reclaimfor(key);
 			return true;
-		} else if(A1in.search(data))
+		} else if(A1in.search(key))
 			return true;
 		else
 		{
-			reclaimfor(data);
+			reclaimfor(key);
 			return false;
 		}
 	}

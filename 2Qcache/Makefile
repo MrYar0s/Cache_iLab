@@ -7,7 +7,7 @@ INCLUDE_PATH = include/cache.hpp
 
 .PHONY: all uninstall
 
-all: $(TARGET) clean
+all: $(TARGET)
 
 main.o: $(SOURCE_PATH)
 			$(CXX) -c -o main.o $(SOURCE_PATH)
