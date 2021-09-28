@@ -3,8 +3,8 @@
 #include <iterator>
 #include <sys/time.h>
 
-#define Kin 0.2
-#define Kout 0.25
+const double Kin = 0.2;
+const double Kout = 0.25;
 
 template <typename T, typename data_t=int>
 struct queue_
@@ -27,29 +27,39 @@ struct queue_
 		max_size = size;
 		cur_size = 0;
 	}
-	void add_data(T data)
+	void add_data(T key)
 	{
-		list_.push_front(data);
-		hash_[data] = list_.begin();
+		list_.push_front(key);
+		hash_[key] = list_.begin();
 		cur_size++;
 	}
-	void remove_data(T data)
+	void remove_data(T key)
 	{
-		if(data == list_.back())
+		if(key == list_.back())
 		{
 			list_.pop_back();
 		}
 		else
 		{
-			auto x = hash_.find(data);
+			auto x = hash_.find(key);
 			list_.erase(x->second);
 		}
-		hash_.erase(data);
+		hash_.erase(key);
 		cur_size--;
 	}
-	bool search(T data)
+
+	void print()
 	{
-		auto it = hash_.find(data);
+		for (size_t i = 0; i < cur_size; ++i)
+		{
+			printf("%d\n", list_.back());
+			list_.pop_back();
+		}
+	}
+
+	bool search(T key)
+	{
+		auto it = hash_.find(key);
 		if(it == hash_.end())
 			return false;
 		else
