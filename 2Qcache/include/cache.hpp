@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <list>
 #include <iterator>
+#include <sys/time.h>
 
 #define Kin 0.2
 #define Kout 0.25
@@ -12,7 +13,8 @@ struct queue_
 	size_t cur_size;
 
 	std::list<T> list_;
-	std::unordered_map<data_t, T*> hash_;
+	using ListIt = typename std::list<T>::iterator;
+	std::unordered_map<T, ListIt> hash_;
 
 	queue_()
 	{
@@ -28,18 +30,26 @@ struct queue_
 	void add_data(T data)
 	{
 		list_.push_front(data);
-		hash_.insert({data, &data});
+		hash_[data] = list_.begin();
 		cur_size++;
 	}
 	void remove_data(T data)
 	{
+		if(data == list_.back())
+		{
+			list_.pop_back();
+		}
+		else
+		{
+			auto x = hash_.find(data);
+			list_.erase(x->second);
+		}
 		hash_.erase(data);
-		list_.remove(data);
 		cur_size--;
 	}
 	bool search(T data)
 	{
-		typename std::unordered_map<data_t,T*>::iterator it = hash_.find(data);
+		auto it = hash_.find(data);
 		if(it == hash_.end())
 			return false;
 		else
