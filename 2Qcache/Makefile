@@ -12,7 +12,7 @@ all: $(TARGET)
 main.o: $(SOURCE_PATH)
 			$(CXX) -c -o main.o $(SOURCE_PATH)
 $(TARGET): main.o $(INCLUDE_PATH)
-	$(CXX) -o $(TARGET) $(STAND) $(OPTS) $(INCLUDE_PATH)
+	$(CXX) -o $(TARGET) $(STAND) $(OPTS) $(SOURCE_PATH)
 
 clean:
 	rm -rf *.o
