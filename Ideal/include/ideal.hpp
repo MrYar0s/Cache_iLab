@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <iterator>
 #include <algorithm>
-#include <iostream>
 
 template <typename T>
 struct ideal_
