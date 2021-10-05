@@ -1,7 +1,6 @@
 #include <unordered_map>
 #include <list>
 #include <iterator>
-#include <sys/time.h>
 
 const double Kin = 0.2;
 const double Kout = 0.25;
