@@ -9,8 +9,8 @@ const double Kout = 0.25;
 template <typename T>
 struct queue_
 {
-	size_t max_size;
-	size_t cur_size;
+	int max_size;
+	int cur_size;
 
 	std::list<T> list_;
 	using ListIt = typename std::list<T>::iterator;
@@ -18,7 +18,7 @@ struct queue_
 
 	queue_() : max_size(), cur_size() {}
 
-	queue_(size_t size)
+	queue_(int size)
 	{
 		max_size = size;
 		cur_size = 0;
@@ -46,16 +46,7 @@ struct queue_
 		cur_size--;
 	}
 
-	void print()
-	{
-		for (size_t i = 0; i < cur_size; ++i)
-		{
-			printf("%d\n", list_.back());
-			list_.pop_back();
-		}
-	}
-
-	bool search(T key)
+	bool search(T key) const
 	{
 		auto it = hash_.find(key);
 		if(it == hash_.end())
@@ -64,7 +55,7 @@ struct queue_
 			return true;
 	}
 
-	bool full()
+	bool full() const
 	{
 		if(max_size == cur_size)
 			return true;
@@ -79,12 +70,12 @@ struct cache_
 	queue_<T> A1in;
 	queue_<T> A1out;
 
-	cache_(size_t size)
+	cache_(int size)
 	{
-		size_t size_a1out = Kout * size;
+		int size_a1out = Kout * size;
 		if(!size_a1out)
 			size_a1out = 1;
-		size_t size_a1in = Kin * (size - size_a1out);
+		int size_a1in = Kin * (size - size_a1out);
 		if(!size_a1in)
 			size_a1in = 1;
 		int size_am = size - size_a1out - size_a1in;
@@ -92,7 +83,7 @@ struct cache_
 			size_am = 1;
 		A1in = queue_<T>(size_a1in);
 		A1out = queue_<T>(size_a1out);
-		Am = queue_<T>((size_t)size_am);
+		Am = queue_<T>(size_am);
 	}
 
 	void reclaimfor(T key)
